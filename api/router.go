@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
-	"github.com/ansible-semaphore/semaphore/api/helpers"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/ansible-semaphore/semaphore/api/helpers"
 
 	"github.com/ansible-semaphore/semaphore/api/projects"
 	"github.com/ansible-semaphore/semaphore/api/sockets"
@@ -177,6 +178,7 @@ func Route() *mux.Router {
 	projectInventoryManagement.HandleFunc("/{inventory_id}", projects.GetInventory).Methods("GET", "HEAD")
 	projectInventoryManagement.HandleFunc("/{inventory_id}", projects.UpdateInventory).Methods("PUT")
 	projectInventoryManagement.HandleFunc("/{inventory_id}", projects.RemoveInventory).Methods("DELETE")
+	projectInventoryManagement.HandleFunc("/{inventory_id}/hosts", projects.GetInventoryHosts).Methods("GET", "HEAD")
 
 	projectEnvManagement := projectUserAPI.PathPrefix("/environment").Subrouter()
 	projectEnvManagement.Use(projects.EnvironmentMiddleware)
@@ -248,7 +250,7 @@ func servePublic(w http.ResponseWriter, r *http.Request) {
 
 	path := r.URL.Path
 
-	if path == webPath + "api" || strings.HasPrefix(path, webPath + "api/") {
+	if path == webPath+"api" || strings.HasPrefix(path, webPath+"api/") {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -266,9 +268,9 @@ func servePublic(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		path = htmlPrefix+"/index.html"
+		path = htmlPrefix + "/index.html"
 	} else if !strings.Contains(path, ".") {
-		path = htmlPrefix+"/index.html"
+		path = htmlPrefix + "/index.html"
 	}
 
 	path = strings.Replace(path, webPath+publicAssetsPrefix+"/", "", 1)
