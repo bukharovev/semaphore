@@ -176,7 +176,6 @@ func (t *task) run() {
 	objType := taskTypeID
 	desc := "Task ID " + strconv.Itoa(t.task.ID) + " (" + t.template.Alias + ")" + " is running"
 
-
 	_, err := t.store.CreateEvent(db.Event{
 		ProjectID:   &t.projectID,
 		ObjectType:  &objType,
@@ -406,6 +405,7 @@ func (t *task) runPlaybook() error {
 	if err != nil {
 		return err
 	}
+
 	cmd := exec.Command("ansible-playbook", args...) //nolint: gas
 	cmd.Dir = util.Config.TmpPath + "/repository_" + strconv.Itoa(t.repository.ID)
 	cmd.Env = t.envVars(util.Config.TmpPath, cmd.Dir, nil)
@@ -464,11 +464,18 @@ func (t *task) getPlaybookArgs() ([]string, error) {
 
 	var templateExtraArgs []string
 	if t.template.Arguments != nil {
+
 		err := json.Unmarshal([]byte(*t.template.Arguments), &templateExtraArgs)
 		if err != nil {
 			t.log("Could not unmarshal arguments to []string")
 			return nil, err
 		}
+	}
+
+	if t.task.Host != nil {
+		host := *t.task.Host
+		serverNameArg := fmt.Sprintf("server_name=%s", host)
+		args = append(args, "-e", serverNameArg)
 	}
 
 	var taskExtraArgs []string
