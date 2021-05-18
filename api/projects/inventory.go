@@ -1,14 +1,16 @@
 package projects
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/ansible-semaphore/semaphore/api/helpers"
-	"github.com/ansible-semaphore/semaphore/db"
 	"net/http"
 
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/ansible-semaphore/semaphore/api/helpers"
+	"github.com/ansible-semaphore/semaphore/db"
 
 	"github.com/gorilla/context"
 )
@@ -49,7 +51,7 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 	project := context.Get(r, "project").(db.Project)
 
 	params := db.RetrieveQueryParams{
-		SortBy: r.URL.Query().Get("sort"),
+		SortBy:       r.URL.Query().Get("sort"),
 		SortInverted: r.URL.Query().Get("order") == desc,
 	}
 
@@ -61,6 +63,27 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.WriteJSON(w, http.StatusOK, inventories)
+}
+
+func GetInventoryHosts(w http.ResponseWriter, r *http.Request) {
+	project := context.Get(r, "project").(db.Project)
+
+	inventoryID, err := helpers.GetIntParam("inventory_id", w, r)
+	if err != nil {
+		return
+	}
+
+	inventory, _ := helpers.Store(r).GetInventory(project.ID, inventoryID)
+
+	reg := regexp.MustCompile(`(?im)\[[a-z0-9]*\]`)
+	hostsRow := reg.FindAllString(inventory.Inventory, -1)
+
+	var hosts []string
+	for _, v := range hostsRow {
+		hosts = append(hosts, strings.Trim(v, "[]"))
+	}
+
+	helpers.WriteJSON(w, http.StatusOK, hosts)
 }
 
 // AddInventory creates an inventory in the database
