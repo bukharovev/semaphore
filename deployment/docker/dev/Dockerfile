@@ -31,6 +31,6 @@ COPY . ${APP_ROOT}
 RUN deployment/docker/dev/bin/install
 
 USER semaphore
-EXPOSE 3000
+EXPOSE 3005
 ENTRYPOINT ["/usr/local/bin/semaphore-wrapper"]
 CMD ["./bin/semaphore", "--config", "/etc/semaphore/config.json"]

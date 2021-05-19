@@ -6,9 +6,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
 	"os"
 	"path"
+
+	log "github.com/Sirupsen/logrus"
 
 	"net/url"
 
@@ -62,7 +63,7 @@ type ldapMappings struct {
 
 //ConfigType mapping between Config and the json file that sets it
 type ConfigType struct {
-	MySQL      DbConfig `json:"mysql"`
+	MySQL DbConfig `json:"mysql"`
 
 	// Format `:port_num` eg, :3000
 	// if : is missing it will be corrected
@@ -112,7 +113,7 @@ type ConfigType struct {
 	LdapEnable    bool `json:"ldap_enable"`
 	LdapNeedTLS   bool `json:"ldap_needtls"`
 
-	OldFrontend	  bool `json:"old_frontend"`
+	OldFrontend bool `json:"old_frontend"`
 }
 
 //Config exposes the application configuration storage for use in the application
@@ -240,8 +241,8 @@ func validateConfig() {
 func validatePort() {
 
 	//TODO - why do we do this only with this variable?
-	if len(os.Getenv("PORT")) > 0 {
-		Config.Port = ":" + os.Getenv("PORT")
+	if len(os.Getenv("SEMAPHORE_PORT")) > 0 {
+		Config.Port = ":" + os.Getenv("SEMAPHORE_PORT")
 	}
 	if len(Config.Port) == 0 {
 		Config.Port = ":3000"
