@@ -24,7 +24,7 @@ services:
       context: ./../../../
       dockerfile: ./deployment/docker/prod/Dockerfile
     environment:
-      PORT: 9330
+      SEMAPHORE_PORT: 9330
       SEMAPHORE_DB_USER: semaphore
       SEMAPHORE_DB_PASS: 54643db08bcac5c8dd4da17bdebf0d75
       SEMAPHORE_DB_HOST: '0.0.0.0'
